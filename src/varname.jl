@@ -36,14 +36,14 @@ function varname(expr)
     ex = deepcopy(expr)
     ex isa Symbol && return :($(DynamicPPL.VarName){$(QuoteNode(ex))}(""))
     ex.head == :ref || throw("VarName: Mis-formed variable name $(expr)!")
-    inds = :(())
+    inds = []
     while ex.head == :ref
         if length(ex.args) >= 2
-            strs = map(x -> :($x === (:) ? "Colon()" : string($x)), ex.args[2:end])
-            pushfirst!(inds.args, :("[" * join($(Expr(:vect, strs...)), ",") * "]"))
+            strs = map(x -> x === Colon() ? "Colon()" : string(x), ex.args[2:end])
+            pushfirst!(inds, "[" * join(strs, ",") * "]")
         end
         ex = ex.args[1]
-        ex isa Symbol && return :($(DynamicPPL.VarName){$(QuoteNode(ex))}(foldl(*, $inds, init = "")))
+        ex isa Symbol && return :($(DynamicPPL.VarName){$(QuoteNode(ex))}($(foldl(*, inds, init = ""))))
     end
     throw("VarName: Mis-formed variable name $(expr)!")
 end
