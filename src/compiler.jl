@@ -340,7 +340,7 @@ function build_output(model_info)
     return quote
         function $evaluator(
             _model::$(DynamicPPL.Model),
-            _varinfo::$(DynamicPPL.VarInfo),
+            _varinfo::$(DynamicPPL.AbstractVarInfo),
             _sampler::$(DynamicPPL.AbstractSampler),
             _context::$(DynamicPPL.AbstractContext),
         )

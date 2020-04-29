@@ -115,7 +115,7 @@ function assume(
     spl::Union{SampleFromPrior,SampleFromUniform},
     dist::Distribution,
     vn::VarName,
-    vi::VarInfo,
+    vi::AbstractVarInfo,
 )
     if haskey(vi, vn)
         # Always overwrite the parameters with new ones for `SampleFromUniform`.
@@ -140,7 +140,7 @@ function observe(
     spl::Union{SampleFromPrior, SampleFromUniform},
     dist::Distribution,
     value,
-    vi::VarInfo,
+    vi::AbstractVarInfo,
 )
     increment_num_produce!(vi)
     return Distributions.logpdf(dist, value)
@@ -237,7 +237,7 @@ function _dot_tilde(
     right::Union{MultivariateDistribution, AbstractVector{<:MultivariateDistribution}},
     left::AbstractMatrix{>:AbstractVector},
     vn::AbstractVector{<:VarName},
-    vi::VarInfo,
+    vi::AbstractVarInfo,
 )
     throw(ambiguity_error_msg())
 end
@@ -247,7 +247,7 @@ function dot_assume(
     dist::MultivariateDistribution,
     vns::AbstractVector{<:VarName},
     var::AbstractMatrix,
-    vi::VarInfo,
+    vi::AbstractVarInfo,
 )
     @assert length(dist) == size(var, 1)
     r = get_and_set_val!(vi, vns, dist, spl)
@@ -260,7 +260,7 @@ function dot_assume(
     dists::Union{Distribution, AbstractArray{<:Distribution}},
     vns::AbstractArray{<:VarName},
     var::AbstractArray,
-    vi::VarInfo,
+    vi::AbstractVarInfo,
 )
     r = get_and_set_val!(vi, vns, dists, spl)
     # Make sure `r` is not a matrix for multivariate distributions
@@ -273,13 +273,13 @@ function dot_assume(
     ::Any,
     ::AbstractArray{<:VarName},
     ::Any,
-    ::VarInfo
+    ::AbstractVarInfo
 )
     error("[DynamicPPL] $(alg_str(spl)) doesn't support vectorizing assume statement")
 end
 
 function get_and_set_val!(
-    vi::VarInfo,
+    vi::AbstractVarInfo,
     vns::AbstractVector{<:VarName},
     dist::MultivariateDistribution,
     spl::Union{SampleFromPrior,SampleFromUniform},
@@ -310,7 +310,7 @@ function get_and_set_val!(
 end
 
 function get_and_set_val!(
-    vi::VarInfo,
+    vi::AbstractVarInfo,
     vns::AbstractArray{<:VarName},
     dists::Union{Distribution, AbstractArray{<:Distribution}},
     spl::Union{SampleFromPrior,SampleFromUniform},
@@ -341,7 +341,7 @@ function get_and_set_val!(
 end
 
 function set_val!(
-    vi::VarInfo,
+    vi::AbstractVarInfo,
     vns::AbstractVector{<:VarName},
     dist::MultivariateDistribution,
     val::AbstractMatrix,
@@ -353,7 +353,7 @@ function set_val!(
     return val
 end
 function set_val!(
-    vi::VarInfo,
+    vi::AbstractVarInfo,
     vns::AbstractArray{<:VarName},
     dists::Union{Distribution, AbstractArray{<:Distribution}},
     val::AbstractArray,
@@ -418,7 +418,7 @@ function _dot_tilde(
     sampler::AbstractSampler,
     right::Union{MultivariateDistribution, AbstractVector{<:MultivariateDistribution}},
     left::AbstractMatrix{>:AbstractVector},
-    vi::VarInfo,
+    vi::AbstractVarInfo,
 )
     throw(ambiguity_error_msg())
 end
@@ -427,7 +427,7 @@ function dot_observe(
     spl::Union{SampleFromPrior, SampleFromUniform},
     dist::MultivariateDistribution,
     value::AbstractMatrix,
-    vi::VarInfo,
+    vi::AbstractVarInfo,
 )
     increment_num_produce!(vi)
     DynamicPPL.DEBUG && @debug "dist = $dist"
@@ -438,7 +438,7 @@ function dot_observe(
     spl::Union{SampleFromPrior, SampleFromUniform},
     dists::Union{Distribution, AbstractArray{<:Distribution}},
     value::AbstractArray,
-    vi::VarInfo,
+    vi::AbstractVarInfo,
 )
     increment_num_produce!(vi)
     DynamicPPL.DEBUG && @debug "dists = $dists"
@@ -449,7 +449,7 @@ function dot_observe(
     spl::Sampler,
     ::Any,
     ::Any,
-    ::VarInfo,
+    ::AbstractVarInfo,
 )
     error("[DynamicPPL] $(alg_str(spl)) doesn't support vectorizing observe statement")
 end

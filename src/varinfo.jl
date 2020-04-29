@@ -230,7 +230,7 @@ end
 
 Return the metadata in `vi` that belongs to `vn`.
 """
-getmetadata(vi::VarInfo, vn::VarName) = vi.metadata
+getmetadata(vi::UntypedVarInfo, vn::VarName) = vi.metadata
 getmetadata(vi::TypedVarInfo, vn::VarName) = getfield(vi.metadata, getsym(vn))
 
 """
@@ -238,14 +238,14 @@ getmetadata(vi::TypedVarInfo, vn::VarName) = getfield(vi.metadata, getsym(vn))
 
 Return the index of `vn` in the metadata of `vi` corresponding to `vn`.
 """
-getidx(vi::VarInfo, vn::VarName) = getmetadata(vi, vn).idcs[vn]
+getidx(vi::AbstractVarInfo, vn::VarName) = getmetadata(vi, vn).idcs[vn]
 
 """
     getrange(vi::VarInfo, vn::VarName)
 
 Return the index range of `vn` in the metadata of `vi`.
 """
-getrange(vi::VarInfo, vn::VarName) = getmetadata(vi, vn).ranges[getidx(vi, vn)]
+getrange(vi::AbstractVarInfo, vn::VarName) = getmetadata(vi, vn).ranges[getidx(vi, vn)]
 
 """
     getranges(vi::AbstractVarInfo, vns::Vector{<:VarName})
@@ -261,7 +261,7 @@ end
 
 Return the distribution from which `vn` was sampled in `vi`.
 """
-getdist(vi::VarInfo, vn::VarName) = getmetadata(vi, vn).dists[getidx(vi, vn)]
+getdist(vi::AbstractVarInfo, vn::VarName) = getmetadata(vi, vn).dists[getidx(vi, vn)]
 
 """
     getval(vi::VarInfo, vn::VarName)
@@ -270,7 +270,7 @@ Return the value(s) of `vn`.
 
 The values may or may not be transformed to Euclidean space.
 """
-getval(vi::VarInfo, vn::VarName) = view(getmetadata(vi, vn).vals, getrange(vi, vn))
+getval(vi::AbstractVarInfo, vn::VarName) = view(getmetadata(vi, vn).vals, getrange(vi, vn))
 
 """
     setval!(vi::VarInfo, val, vn::VarName)
@@ -279,7 +279,7 @@ Set the value(s) of `vn` in the metadata of `vi` to `val`.
 
 The values may or may not be transformed to Euclidean space.
 """
-setval!(vi::VarInfo, val, vn::VarName) = getmetadata(vi, vn).vals[getrange(vi, vn)] = val
+setval!(vi::AbstractVarInfo, val, vn::VarName) = getmetadata(vi, vn).vals[getrange(vi, vn)] = val
 
 """
     getval(vi::VarInfo, vns::Vector{<:VarName})
@@ -335,7 +335,7 @@ end
 
 Return the set of sampler selectors associated with `vn` in `vi`.
 """
-getgid(vi::VarInfo, vn::VarName) = getmetadata(vi, vn).gids[getidx(vi, vn)]
+getgid(vi::AbstractVarInfo, vn::VarName) = getmetadata(vi, vn).gids[getidx(vi, vn)]
 
 """
     settrans!(vi::VarInfo, trans::Bool, vn::VarName)
@@ -474,7 +474,7 @@ end
 
 Set `vn`'s value for `flag` to `true` in `vi`.
 """
-function set_flag!(vi::VarInfo, vn::VarName, flag::String)
+function set_flag!(vi::AbstractVarInfo, vn::VarName, flag::String)
     return getmetadata(vi, vn).flags[flag][getidx(vi, vn)] = true
 end
 
@@ -550,7 +550,7 @@ zeros.
 
 This is useful when using a sampling algorithm that assumes an empty `vi`, e.g. `SMC`.
 """
-function empty!(vi::VarInfo)
+function empty!(vi::AbstractVarInfo)
     _empty!(vi.metadata)
     resetlogp!(vi)
     reset_num_produce!(vi)
@@ -578,7 +578,7 @@ keys(vi::UntypedVarInfo) = keys(vi.metadata.idcs)
 
 Add `gid` to the set of sampler selectors associated with `vn` in `vi`.
 """
-setgid!(vi::VarInfo, gid::Selector, vn::VarName) = push!(getmetadata(vi, vn).gids[getidx(vi, vn)], gid)
+setgid!(vi::AbstractVarInfo, gid::Selector, vn::VarName) = push!(getmetadata(vi, vn).gids[getidx(vi, vn)], gid)
 
 """
     istrans(vi::VarInfo, vn::VarName)
@@ -760,7 +760,7 @@ end
 
 
 """
-    islinked(vi::VarInfo, spl::Sampler)
+    islinked(vi::VarInfo, spl::AbstractSampler)
 
 Check whether `vi` is in the transformed space for a particular sampler `spl`.
 
@@ -769,11 +769,11 @@ Turing's Hamiltonian samplers use the `link` and `invlink` functions from
 (for example, one bounded to the space `[0, 1]`) from its constrained space to the set of 
 real numbers. `islinked` checks if the number is in the constrained space or the real space.
 """
-function islinked(vi::UntypedVarInfo, spl::Sampler)
+function islinked(vi::UntypedVarInfo, spl::AbstractSampler)
     vns = _getvns(vi, spl)
     return istrans(vi, vns[1])
 end
-function islinked(vi::TypedVarInfo, spl::Sampler)
+function islinked(vi::TypedVarInfo, spl::AbstractSampler)
     vns = _getvns(vi, spl)
     return _islinked(vi, vns)
 end
@@ -890,7 +890,7 @@ variables `x` would return
 (x = ([1.5, 2.0], [3.0, 1.0], ["x[1]", "x[2]"]), )
 ```
 """
-function tonamedtuple(vi::VarInfo)
+function tonamedtuple(vi::TypedVarInfo)
     return tonamedtuple(vi.metadata, vi)
 end
 @generated function tonamedtuple(metadata::NamedTuple{names}, vi::VarInfo) where {names}
@@ -918,7 +918,7 @@ end
 
 Check whether `vn` has been sampled in `vi`.
 """
-haskey(vi::VarInfo, vn::VarName) = haskey(getmetadata(vi, vn).idcs, vn)
+haskey(vi::UntypedVarInfo, vn::VarName) = haskey(getmetadata(vi, vn).idcs, vn)
 function haskey(vi::TypedVarInfo, vn::VarName)
     metadata = vi.metadata
     Tmeta = typeof(metadata)
@@ -1005,22 +1005,23 @@ selector `gid` from a distribution `dist` to `VarInfo` `vi`.
 function push!(vi::AbstractVarInfo, vn::VarName, r, dist::Distribution, gid::Selector)
     return push!(vi, vn, r, dist, Set([gid]))
 end
+function push_assert(vi::UntypedVarInfo, vn::VarName, dist, gidset)
+    @assert ~(vn in keys(vi)) "[push!] attempt to add an exisitng variable $(getsym(vn)) ($(vn)) to VarInfo (keys=$(keys(vi))) with dist=$dist, gid=$gidset"
+end
+function push_assert(vi::TypedVarInfo, vn::VarName, dist, gidset)
+    @assert ~(haskey(vi, vn)) "[push!] attempt to add an exisitng variable $(getsym(vn)) ($(vn)) to TypedVarInfo of syms $(syms(vi)) with dist=$dist, gid=$gidset"
+end
+
 function push!(
-            vi::VarInfo,
+            vi::AbstractVarInfo,
             vn::VarName,
             r,
             dist::Distribution,
             gidset::Set{Selector}
             )
 
-    if vi isa UntypedVarInfo
-        @assert ~(vn in keys(vi)) "[push!] attempt to add an exisitng variable $(getsym(vn)) ($(vn)) to VarInfo (keys=$(keys(vi))) with dist=$dist, gid=$gidset"
-    elseif vi isa TypedVarInfo
-        @assert ~(haskey(vi, vn)) "[push!] attempt to add an exisitng variable $(getsym(vn)) ($(vn)) to TypedVarInfo of syms $(syms(vi)) with dist=$dist, gid=$gidset"
-    end
-
+    push_assert(vi, vn, dist, gidset)
     val = vectorize(dist, r)
-
     meta = getmetadata(vi, vn)
     meta.idcs[vn] = length(meta.idcs) + 1
     push!(meta.vns, vn)
@@ -1042,7 +1043,7 @@ end
 Set the `order` of `vn` in `vi` to `index`, where `order` is the number of `observe
 statements run before sampling `vn`.
 """
-function setorder!(vi::VarInfo, vn::VarName, index::Int)
+function setorder!(vi::AbstractVarInfo, vn::VarName, index::Int)
     metadata = getmetadata(vi, vn)
     if metadata.orders[metadata.idcs[vn]] != index
         metadata.orders[metadata.idcs[vn]] = index
@@ -1059,7 +1060,7 @@ end
 
 Check whether `vn` has a true value for `flag` in `vi`.
 """
-function is_flagged(vi::VarInfo, vn::VarName, flag::String)
+function is_flagged(vi::AbstractVarInfo, vn::VarName, flag::String)
     return getmetadata(vi, vn).flags[flag][getidx(vi, vn)]
 end
 
@@ -1068,7 +1069,7 @@ end
 
 Set `vn`'s value for `flag` to `false` in `vi`.
 """
-function unset_flag!(vi::VarInfo, vn::VarName, flag::String)
+function unset_flag!(vi::AbstractVarInfo, vn::VarName, flag::String)
     return getmetadata(vi, vn).flags[flag][getidx(vi, vn)] = false
 end
 
