@@ -47,7 +47,7 @@ reset_num_produce!(vi::LazyVarInfo) = reset_num_produce!(vi.varinfo)
 set_num_produce!(vi::LazyVarInfo, n::Int) = set_num_produce!(vi.varinfo, n)
 
 getall(vi::LazyVarInfo) = getall(vi.varinfo)
-syms(vi::LazyVarInfo) = symx(vi.varinfo)
+syms(vi::LazyVarInfo) = syms(vi.varinfo)
 isempty(vi::LazyVarInfo) = isempty(vi.varinfo)
 getmetadata(vi::LazyVarInfo, vn::VarName) = getmetadata(vi.varinfo, vn)
 getidx(vi::LazyVarInfo, vn::VarName) = getidx(vi.varinfo, vn)
