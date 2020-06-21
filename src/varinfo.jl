@@ -400,7 +400,7 @@ end
         # If the varname is in the sampler space
         # or the sample space is empty (all variables)
         # then return the indices for that variable.
-        if inspace(f, space) || length(space) == 0
+        if isempty(space) || inspace(f, space)
             push!(exprs, :($f = findinds(metadata.$f, s, Val($space))))
         end
     end
