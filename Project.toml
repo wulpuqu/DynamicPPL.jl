@@ -1,7 +1,7 @@
 name = "DynamicPPL"
 uuid = "366bfd00-2699-11ea-058f-f148b4cae6d8"
 authors = ["mohamed82008 <mohamed82008@gmail.com>"]
-version = "0.8.1"
+version = "0.8.2"
 
 [deps]
 AbstractMCMC = "80f14c24-f653-4e6a-9b94-39d6b0f70001"
@@ -12,7 +12,7 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 ZygoteRules = "700de1a5-db45-46bc-99cf-38207098b444"
 
 [compat]
-AbstractMCMC = "1"
+AbstractMCMC = "2"
 Bijectors = "0.5.2, 0.6, 0.7, 0.8"
 Distributions = "0.22, 0.23"
 MacroTools = "0.5.1"
@@ -22,6 +22,7 @@ julia = "1"
 [extras]
 AdvancedHMC = "0bf59076-c3b1-5ca4-86bd-e02cd72cde3d"
 AdvancedMH = "5b7e9947-ddc0-4b3f-9b55-0d8042f74170"
+BangBang = "198e06fe-97b7-11e9-32a5-e1d131e6ad66"
 BinaryProvider = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 DistributionsAD = "ced4e74d-a319-5a8a-b0ac-84af2272839c"
@@ -50,4 +51,4 @@ UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [targets]
-test = ["AdvancedHMC", "AdvancedMH", "Distributed", "DistributionsAD", "DocStringExtensions", "EllipticalSliceSampling", "ForwardDiff", "Libtask", "LinearAlgebra", "LogDensityProblems", "Logging", "MCMCChains", "Markdown", "PDMats", "ProgressLogging", "Random", "Reexport", "Requires", "Serialization", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test", "Tracker", "UUIDs", "Zygote"]
+test = ["AdvancedHMC", "AdvancedMH", "BangBang", "Distributed", "DistributionsAD", "DocStringExtensions", "EllipticalSliceSampling", "ForwardDiff", "Libtask", "LinearAlgebra", "LogDensityProblems", "Logging", "MCMCChains", "Markdown", "PDMats", "ProgressLogging", "Random", "Reexport", "Requires", "Serialization", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test", "Tracker", "UUIDs", "Zygote"]

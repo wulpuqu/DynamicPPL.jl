@@ -60,7 +60,6 @@ export  AbstractVarInfo,
         Sample,
         init,
         vectorize,
-        set_resume!,
 # Model
         Model,
         getmissings,

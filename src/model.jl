@@ -109,9 +109,6 @@ See also: [`evaluate_threadsafe`](@ref)
 """
 function evaluate_threadunsafe(rng, model, varinfo, sampler, context)
     resetlogp!(varinfo)
-    if has_eval_num(sampler)
-        sampler.state.eval_num += 1
-    end
     return _evaluate(rng, model, varinfo, sampler, context)
 end
 
@@ -128,9 +125,6 @@ See also: [`evaluate_threadunsafe`](@ref)
 """
 function evaluate_threadsafe(rng, model, varinfo, sampler, context)
     resetlogp!(varinfo)
-    if has_eval_num(sampler)
-        sampler.state.eval_num += 1
-    end
     wrapper = ThreadSafeVarInfo(varinfo)
     result = _evaluate(rng, model, wrapper, sampler, context)
     setlogp!(varinfo, getlogp(wrapper))
